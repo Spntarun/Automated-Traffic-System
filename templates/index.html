@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Traffic System (ATS)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="glass-panel">
+            <h1>Automated Traffic System (ATS)</h1>
+            <p>Intelligent Intersection Management with YOLO</p>
+            <div id="global-alert-popup" class="global-popup" style="display: none;">
+                <h2 id="global-alert-text">Alert</h2>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Left Panel: Intersection Simulation -->
+            <section class="simulation-panel glass-panel">
+                <h2>Intersection Simulation</h2>
+                
+                <div class="intersection">
+                    <div class="road road-vertical"></div>
+                    <div class="road road-horizontal"></div>
+                    <div class="center-box"></div>
+                    
+                    <!-- Traffic Lights -->
+                    <div class="traffic-light light-north" id="light-N">
+                        <div class="timer" id="timer-v-N">--</div>
+                        <div class="bulb red"></div>
+                        <div class="bulb yellow"></div>
+                        <div class="bulb green"></div>
+                        <span class="label">North Lane</span>
+                    </div>
+                    
+                    <div class="traffic-light light-south" id="light-S">
+                        <div class="timer" id="timer-v-S">--</div>
+                        <div class="bulb red"></div>
+                        <div class="bulb yellow"></div>
+                        <div class="bulb green"></div>
+                        <span class="label">South Lane</span>
+                    </div>
+                    
+                    <div class="traffic-light light-east" id="light-E">
+                        <div class="timer" id="timer-v-E">--</div>
+                        <div class="bulb red"></div>
+                        <div class="bulb yellow"></div>
+                        <div class="bulb green"></div>
+                        <span class="label">East Lane</span>
+                    </div>
+                    
+                    <div class="traffic-light light-west" id="light-W">
+                        <div class="timer" id="timer-v-W">--</div>
+                        <div class="bulb red"></div>
+                        <div class="bulb yellow"></div>
+                        <div class="bulb green"></div>
+                        <span class="label">West Lane</span>
+                    </div>
+
+                    <!-- Pedestrian Lights (4 directions) -->
+                    <div class="pedestrian-light ped-north" id="ped-N">
+                        <div class="timer" id="timer-p-N">--</div>
+                        <div class="icon walk-icon">🚶</div><div class="icon stop-icon">✋</div>
+                    </div>
+                    
+                    <!-- Live Output Displays in Corners -->
+                    <img class="sim-img sim-img-north" id="out-N" src="" style="display:none;" alt="North Feed">
+                    <img class="sim-img sim-img-south" id="out-S" src="" style="display:none;" alt="South Feed">
+                    <img class="sim-img sim-img-east" id="out-E" src="" style="display:none;" alt="East Feed">
+                    <img class="sim-img sim-img-west" id="out-W" src="" style="display:none;" alt="West Feed">
+                    <div class="pedestrian-light ped-south" id="ped-S">
+                        <div class="timer" id="timer-p-S">--</div>
+                        <div class="icon walk-icon">🚶</div><div class="icon stop-icon">✋</div>
+                    </div>
+                    <div class="pedestrian-light ped-east" id="ped-E">
+                        <div class="timer" id="timer-p-E">--</div>
+                        <div class="icon walk-icon">🚶</div><div class="icon stop-icon">✋</div>
+                    </div>
+                    <div class="pedestrian-light ped-west" id="ped-W">
+                        <div class="timer" id="timer-p-W">--</div>
+                        <div class="icon walk-icon">🚶</div><div class="icon stop-icon">✋</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Controls -->
+            <section class="controls-panel">
+                <div class="status-board glass-panel">
+                    <h2>Live Telemetry & Controls</h2>
+                    <div class="telemetry-grid">
+                        
+                        <!-- North -->
+                        <div class="lane-stat" id="stat-N">
+                            <h3>North Lane</h3>
+                            <div class="alert-badge" id="alert-N" style="display:none;">⚠️ ACCIDENT DETECTED!</div>
+                            <p>Vehicles: <span class="count v-count">0</span> | Emergency: <span class="count e-count">0</span> | Accident: <span class="count a-count">0</span></p>
+                            <div class="upload-box">
+                                <input type="file" id="upload-N" accept="image/*,video/*" onchange="uploadMedia('N')">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-override" onclick="overrideSignal('N')">🚦 Force Green</button>
+                                <button class="btn-override ped-btn" onclick="overridePedestrian('N')">🚶 Ped. Green</button>
+                            </div>
+                        </div>
+
+                        <!-- South -->
+                        <div class="lane-stat" id="stat-S">
+                            <h3>South Lane</h3>
+                            <div class="alert-badge" id="alert-S" style="display:none;">⚠️ ACCIDENT DETECTED!</div>
+                            <p>Vehicles: <span class="count v-count">0</span> | Emergency: <span class="count e-count">0</span> | Accident: <span class="count a-count">0</span></p>
+                            <div class="upload-box">
+                                <input type="file" id="upload-S" accept="image/*,video/*" onchange="uploadMedia('S')">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-override" onclick="overrideSignal('S')">🚦 Force Green</button>
+                                <button class="btn-override ped-btn" onclick="overridePedestrian('S')">🚶 Ped. Green</button>
+                            </div>
+                        </div>
+
+                        <!-- East -->
+                        <div class="lane-stat" id="stat-E">
+                            <h3>East Lane</h3>
+                            <div class="alert-badge" id="alert-E" style="display:none;">⚠️ ACCIDENT DETECTED!</div>
+                            <p>Vehicles: <span class="count v-count">0</span> | Emergency: <span class="count e-count">0</span> | Accident: <span class="count a-count">0</span></p>
+                            <div class="upload-box">
+                                <input type="file" id="upload-E" accept="image/*,video/*" onchange="uploadMedia('E')">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-override" onclick="overrideSignal('E')">🚦 Force Green</button>
+                                <button class="btn-override ped-btn" onclick="overridePedestrian('E')">🚶 Ped. Green</button>
+                            </div>
+                        </div>
+
+                        <!-- West -->
+                        <div class="lane-stat" id="stat-W">
+                            <h3>West Lane</h3>
+                            <div class="alert-badge" id="alert-W" style="display:none;">⚠️ ACCIDENT DETECTED!</div>
+                            <p>Vehicles: <span class="count v-count">0</span> | Emergency: <span class="count e-count">0</span> | Accident: <span class="count a-count">0</span></p>
+                            <div class="upload-box">
+                                <input type="file" id="upload-W" accept="image/*,video/*" onchange="uploadMedia('W')">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-override" onclick="overrideSignal('W')">🚦 Force Green</button>
+                                <button class="btn-override ped-btn" onclick="overridePedestrian('W')">🚶 Ped. Green</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="global-controls">
+                        <button class="btn-primary" id="btn-auto" onclick="resumeAuto()">Resume Auto Optimize Mode</button>
+                        <p class="mode-indicator" id="mode-indicator">Mode: Auto</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Dynamic Congestion Chart -->
+            <section class="chart-panel glass-panel" style="margin-top: 2rem;">
+                <h2>Live Congestion Analysis</h2>
+                <div style="width: 100%; max-width: 800px; margin: 0 auto;">
+                    <canvas id="congestionChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

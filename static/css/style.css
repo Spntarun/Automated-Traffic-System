@@ -1,0 +1,410 @@
+:root {
+    --bg-dark: #0f172a;
+    --bg-panel: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    
+    --color-red: #ef4444;
+    --color-yellow: #f59e0b;
+    --color-green: #10b981;
+    --color-accent: #3b82f6;
+    
+    --road-color: #334155;
+    --road-line: #cbd5e1;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.app-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.app-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.badge {
+    background-color: var(--color-red);
+    color: white;
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    animation: pulse 2s infinite;
+}
+
+.app-header p {
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.simulation-panel {
+    width: 100%;
+}
+
+.controls-panel {
+    width: 100%;
+}
+
+.sim-img {
+    position: absolute;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    object-fit: cover;
+    z-index: 15;
+    width: 32%; /* Increased from 25% */
+    max-width: 450px; /* Increased from 200px */
+    background: #000;
+}
+
+.sim-img-north { top: 2%; left: 2%; }
+.sim-img-south { bottom: 2%; right: 2%; }
+.sim-img-east { right: 2%; top: 2%; }
+.sim-img-west { left: 2%; bottom: 2%; }
+
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Intersection CSS */
+.intersection {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #1e293b;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.road {
+    position: absolute;
+    background-color: var(--road-color);
+}
+
+.road-vertical {
+    width: 30%;
+    height: 100%;
+    border-left: 2px dashed var(--road-line);
+    border-right: 2px dashed var(--road-line);
+}
+
+.road-horizontal {
+    width: 100%;
+    height: 30%;
+    border-top: 2px dashed var(--road-line);
+    border-bottom: 2px dashed var(--road-line);
+}
+
+.center-box {
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background-color: var(--road-color);
+    z-index: 5;
+}
+
+/* Traffic Lights */
+.traffic-light {
+    position: absolute;
+    background-color: #0f172a;
+    padding: 10px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+    border: 2px solid #475569;
+}
+
+.bulb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #333;
+    opacity: 0.3;
+    transition: all 0.3s ease;
+}
+
+.timer {
+    background: #000;
+    color: #f8fafc;
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid #333;
+}
+
+.traffic-light .label {
+    font-size: 0.72rem;
+    text-align: center;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+/* Active states */
+.traffic-light.state-Red .bulb.red { background-color: var(--color-red); opacity: 1; box-shadow: 0 0 15px var(--color-red); }
+.traffic-light.state-Yellow .bulb.yellow { background-color: var(--color-yellow); opacity: 1; box-shadow: 0 0 15px var(--color-yellow); }
+.traffic-light.state-Green .bulb.green { background-color: var(--color-green); opacity: 1; box-shadow: 0 0 15px var(--color-green); }
+
+/* Positioning Lights */
+.light-north { top: 5%; right: 40%; flex-direction: row; }
+.light-south { bottom: 5%; left: 40%; flex-direction: row; }
+.light-east { right: 5%; bottom: 40%; }
+.light-west { left: 5%; top: 40%; }
+
+.light-north .label, .light-south .label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+}
+.light-east .label, .light-west .label {
+    margin-top: 6px;
+    width: 100%;
+}
+
+/* Pedestrian Lights */
+.pedestrian-light {
+    position: absolute;
+    z-index: 10;
+    background: #000;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    gap: 4px;
+    border: 1px solid #333;
+}
+
+.pedestrian-light .icon {
+    font-size: 1rem;
+    opacity: 0.3;
+}
+
+.pedestrian-light.state-Green .walk-icon { opacity: 1; text-shadow: 0 0 10px var(--color-green); }
+.pedestrian-light.state-Red .stop-icon { opacity: 1; text-shadow: 0 0 10px var(--color-red); }
+
+/* Positions for 4 pedestrian signals */
+.ped-north { top: 32%; right: 42%; }
+.ped-south { bottom: 32%; left: 42%; }
+.ped-east { right: 32%; bottom: 42%; flex-direction: column; }
+.ped-west { left: 32%; top: 42%; flex-direction: column; }
+
+.pedestrian-light.state-Green .walk-icon { opacity: 1; text-shadow: 0 0 10px var(--color-green); }
+.pedestrian-light.state-Red .stop-icon { opacity: 1; text-shadow: 0 0 10px var(--color-red); }
+
+/* Telemetry Grid */
+.telemetry-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.lane-stat {
+    background: rgba(15, 23, 42, 0.5);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s;
+}
+
+.alert-badge {
+    background: var(--color-red);
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    animation: pulse 1s infinite;
+}
+
+.alert-badge.emergency-badge {
+    background: #ea580c;
+    box-shadow: 0 0 12px rgba(234, 88, 12, 0.7);
+}
+
+.alert-active {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: var(--color-red) !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8) !important;
+}
+
+.emergency-active {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: var(--color-yellow) !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.7) !important;
+}
+
+.global-popup {
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    animation: pulse 1s infinite;
+}
+
+.popup-emergency {
+    background: rgba(245, 158, 11, 0.9);
+    color: white;
+}
+
+.popup-accident {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+}
+
+.lane-stat h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-accent);
+}
+
+.lane-stat p {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.lane-stat .count {
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.upload-box {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.upload-box input {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    width: 100%;
+}
+
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-override {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    padding: 0.5rem 0.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.ped-btn {
+    border-color: var(--color-green);
+    color: var(--color-green);
+}
+
+.btn-override:hover, .ped-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.global-controls {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+.mode-indicator {
+    font-weight: bold;
+    color: var(--color-green);
+}
+.mode-indicator.manual {
+    color: var(--color-yellow);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 900px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+}
